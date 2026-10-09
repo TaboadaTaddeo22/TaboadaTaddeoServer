@@ -38,27 +38,37 @@ public class TaboadaTaddeoServer {
         server.close();
         */
         
-        int porta=12345;
-        ServerSocket server=new ServerSocket(porta);
+        int porta = 12345;
+        ServerSocket server = new ServerSocket(porta);
         Socket clientSocket = server.accept();
-        String response;
-        Scanner scanner=new Scanner(System.in);
+        String message;
+        Scanner scanner = new Scanner(System.in);
        
         InputStream inputStream = clientSocket.getInputStream();
         DataInputStream dataInputStream = new DataInputStream(inputStream);
         OutputStream outputStream = clientSocket.getOutputStream();
         DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+        
+        // Primo messaggio
+        message = "Ciao sono il server di Taddeo!";
+        dataOutputStream.writeUTF(message);
        
-        do{
+        do {
         String clientMessage = dataInputStream.readUTF(); // Su clientMessage ho i dati del Client
-        System.out.println("messaggia:");
-        response = scanner.next();
-        dataOutputStream.writeUTF(response);
-       
-        System.out.println(response);
-        System.out.println(clientMessage);
-        }while(!response.equals("Arrivederci"));
-        clientSocket.close();
+        System.out.println("Ricevuto messaggio: " + clientMessage);
+        System.out.println("\n");
+        
+        System.out.println("Scrivi il tuo messaggio:");
+        message = scanner.nextLine();
+        dataOutputStream.writeUTF(message);
+        System.out.println("\n");
+        
+        if (clientMessage.equals("Arrivederci"))
+            clientSocket.close();
+        
+        } while(!message.equals("Arrivederci"));
+        
+        
         server.close();
     }
     
