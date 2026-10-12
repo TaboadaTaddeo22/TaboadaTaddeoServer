@@ -18,32 +18,12 @@ public class TaboadaTaddeoServer {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        /*
-        int port = 12345;
-        ServerSocket server;
-        server = new ServerSocket(port);
-        
-        Socket client = server.accept();
-        
-        InputStream inputStream = client.getInputStream();
-        DataInputStream dataInputStream = new DataInputStream(inputStream);
-        String clientMessage = dataInputStream.readUTF(); // Su clientMessage ho i dati del Client
-        System.out.println(clientMessage);
-        
-        OutputStream outputStream = client.getOutputStream();
-        DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
-        String response = "Ciao, client!"; dataOutputStream.writeUTF(response);
-        
-        client.close();
-        server.close();
-        */
-        
         int porta = 12345;
         ServerSocket server = new ServerSocket(porta);
-        Socket clientSocket = server.accept();
         String message;
         Scanner scanner = new Scanner(System.in);
        
+        /*
         InputStream inputStream = clientSocket.getInputStream();
         DataInputStream dataInputStream = new DataInputStream(inputStream);
         OutputStream outputStream = clientSocket.getOutputStream();
@@ -52,24 +32,19 @@ public class TaboadaTaddeoServer {
         // Primo messaggio
         message = "Ciao sono il server di Taddeo!";
         dataOutputStream.writeUTF(message);
+        */
        
-        do {
-        String clientMessage = dataInputStream.readUTF(); // Su clientMessage ho i dati del Client
-        System.out.println("Ricevuto messaggio: " + clientMessage);
-        System.out.println("\n");
-        
-        System.out.println("Scrivi il tuo messaggio:");
-        message = scanner.nextLine();
-        dataOutputStream.writeUTF(message);
-        System.out.println("\n");
-        
-        if (clientMessage.equals("Arrivederci"))
-            clientSocket.close();
-        
-        } while(!message.equals("Arrivederci"));
+        while (true) {
+            Socket clientSocket = server.accept();
+            System.out.println("Nuovo client connesso: " + clientSocket.getInetAddress());
+
+            // Un thread per ogni client
+            ClientHandler handler = new ClientHandler(clientSocket);
+            new Thread(handler).start();
+        }
         
         
-        server.close();
+        //server.close();
     }
     
 }
