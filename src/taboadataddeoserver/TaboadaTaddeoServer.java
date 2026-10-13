@@ -7,6 +7,7 @@ package taboadataddeoserver;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -17,34 +18,31 @@ public class TaboadaTaddeoServer {
     /**
      * @param args the command line arguments
      */
+    private static final List<ClientHandler> clients = new CopyOnWriteArrayList<>();
+
     public static void main(String[] args) throws IOException {
         int porta = 12345;
         ServerSocket server = new ServerSocket(porta);
-        String message;
-        Scanner scanner = new Scanner(System.in);
-       
-        /*
-        InputStream inputStream = clientSocket.getInputStream();
-        DataInputStream dataInputStream = new DataInputStream(inputStream);
-        OutputStream outputStream = clientSocket.getOutputStream();
-        DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
-        
-        // Primo messaggio
-        message = "Ciao sono il server di Taddeo!";
-        dataOutputStream.writeUTF(message);
-        */
-       
+        System.out.println("Server avviato sulla porta " + porta + "...");
+
         while (true) {
             Socket clientSocket = server.accept();
             System.out.println("Nuovo client connesso: " + clientSocket.getInetAddress());
 
-            // Un thread per ogni client
             ClientHandler handler = new ClientHandler(clientSocket);
+            clients.add(handler); // Aggiunge il client alla lista
+
             new Thread(handler).start();
         }
-        
-        
-        //server.close();
+    }
+
+    // Metodo per inviare un messaggio a tutti gli altri client
+    public static void broadcast(String message, ClientHandler sender) {
+        for (ClientHandler client : clients) {
+            if (client != sender) { // Non invia il messaggio al mittente stesso
+                client.sendMessage(message);
+            }
+        }
     }
     
 }
